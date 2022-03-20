@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  app:
+    container_name: "skf_video_editor_ui"
+    build:
+        context: .
+    ports:
+        - "3000:3000"
+    command: >
+        sh -c "npm start"
+    environment:
+        - BASE_URL=test_url
