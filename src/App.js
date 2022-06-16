@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import './index.css';
 import { makeStyles } from '@material-ui/core';
 import SignUpContainer from '../src/Forms/SignUpContainer';
 import SignInContainer from '../src/Forms/SignInContainer';
 import VerifyOtp from '../src/Forms/VerifyOtp';
+import Editor from './pages/Editor';
 
 const useStyles = makeStyles({
 	logo: {
@@ -24,13 +25,10 @@ const useStyles = makeStyles({
 
 const App = () => {
 	const classes = useStyles();
+
 	return (
 		<MuiThemeProvider>
-			<SignInContainer />
-
-			<div style={{ position: 'fixed' }} className={classes.logo}>
-				<img src="./skf.png" style={{ width: '150px', height: 'auto' }} />
-			</div>
+			<Editor />
 		</MuiThemeProvider>
 	);
 };
