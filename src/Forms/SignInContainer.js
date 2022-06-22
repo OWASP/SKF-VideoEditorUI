@@ -132,5 +132,4 @@ class SignInContainer extends Component {
 	}
 }
 
-// module.exports = SignUpContainer;
 export default SignInContainer;
