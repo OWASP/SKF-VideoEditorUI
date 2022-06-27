@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core';
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
+import DropzoneComponent from '../Dropzone';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
 	parentContainer: {
 		background: 'rgba(0,0,0,0.9)',
 		height: '100vh',
@@ -108,7 +112,19 @@ const useStyles = makeStyles({
 		marginLeft: '4px',
 		cursor: 'pointer',
 	},
-});
+	modal: {
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	paper: {
+		backgroundColor: theme.palette.background.paper,
+		border: 'none',
+		boxShadow: theme.shadows[5],
+		width: '50vw',
+		height: '40vh',
+	},
+}));
 
 const LeftSidebar = (props) => {
 	const classes = useStyles();
@@ -131,15 +147,37 @@ const LeftSidebar = (props) => {
 			title: 'Text',
 		},
 	]);
+
+	const [open, setOpen] = useState(false);
+	const handleClose = () => setOpen(false);
+	const handleOpen = () => setOpen(true);
 	return (
 		<div className={classes.parentContainer}>
 			<div className={classes.leftNavbar}>
 				<div className={classes.menuBtn}>
 					<img src="./images/menu_btn.svg" alt="menu" />
 				</div>
-				<div className={classes.addBtn}>
+				<div className={classes.addBtn} onClick={handleOpen}>
 					<img src="./images/plus_btn.svg" alt="" />
 				</div>
+				<Modal
+					aria-labelledby="transition-modal-title"
+					aria-describedby="transition-modal-description"
+					className={classes.modal}
+					open={open}
+					onClose={handleClose}
+					closeAfterTransition
+					BackdropComponent={Backdrop}
+					BackdropProps={{
+						timeout: 500,
+					}}
+				>
+					<Fade in={open} style={{ border: 'none' }}>
+						<div className={classes.paper}>
+							<DropzoneComponent />
+						</div>
+					</Fade>
+				</Modal>
 				{sideBtns.map((el, ind) => (
 					<div className={classes.navBtns}>
 						<img
