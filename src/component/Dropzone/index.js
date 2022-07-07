@@ -1,20 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 import Dropzone from 'react-dropzone';
+import { FolderOpenOutlined } from '@mui/icons-material';
 
 const useStyles = makeStyles({
 	dropzone: {
-		background: 'white',
-		width: '100%',
-		height: '40vh',
+		width: `100%`,
+		height: '100%',
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'center',
-		justifyContent: 'center',
+		justifyContent: 'flex-start',
+		padding: '50px 0',
 	},
 });
 
-export default function DropzoneComponent() {
+export default function DropzoneComponent({ style }) {
 	const classes = useStyles();
 	const [fileNames, setFileNames] = useState([]);
 	const handleDrop = useCallback((acceptedFiles) => {
@@ -49,9 +50,15 @@ export default function DropzoneComponent() {
 						>
 							<input {...getInputProps()} />
 							<span style={{ fontSize: '50px' }}>
-								{isDragActive ? '📂' : '📁'}
+								<FolderOpenOutlined
+									style={{ color: '#b3b3b6', fontSize: '50px' }}
+								/>
 							</span>
-							<p>Drag'n'drop images, or click to select files</p>
+							<p>
+								Drag'n'drop images,
+								<br /> or <br />
+								click to select files
+							</p>
 						</div>
 					);
 				}}
