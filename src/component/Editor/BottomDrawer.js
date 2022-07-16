@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Slide } from '@mui/material';
 
@@ -34,9 +34,6 @@ export function TransitionBottom(props) {
 
 const BottomDrawer = ({ progressBarPosition }) => {
 	const classes = useStyles();
-	useEffect(() => {
-		console.log(progressBarPosition);
-	}, [progressBarPosition]);
 	return (
 		<>
 			<div

@@ -11,6 +11,9 @@ const useStyles = makeStyles({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
+		'@media (max-width:425px)': {
+			height: '60px',
+		},
 	},
 	bottomActionBtns: {
 		background: 'rgba(28,28,40,0.8)',

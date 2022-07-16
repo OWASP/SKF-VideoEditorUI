@@ -7,6 +7,7 @@ import CameraOutlinedIcon from '@mui/icons-material/CameraOutlined';
 import MusicVideoOutlinedIcon from '@mui/icons-material/MusicVideoOutlined';
 import ImageSearchOutlinedIcon from '@mui/icons-material/ImageSearchOutlined';
 import { TextFieldsOutlined, WindowOutlined } from '@mui/icons-material';
+import { useMediaQuery } from '@mui/material';
 
 const useStyles = makeStyles({
 	drawerButtonTitle: {
@@ -26,12 +27,29 @@ const useStyles = makeStyles({
 	miniDrawerContainer: {
 		background: '#16161e',
 		position: 'absolute',
-		width: `${dimensions.miniDrawerWidth}px`,
+		width: `${dimensions.miniDrawerWidthLarge}vw`,
 		height: '100vh',
 		left: 0,
-		zIndex: '+10000000000',
+		zIndex: '+10000',
 		overflow: 'auto',
 		borderRight: '1px solid grey',
+		'@media (max-width:1300px)': {
+			width: `${dimensions.miniDrawerWidthMedium}vw`,
+		},
+		'@media (max-width:1000px)': {
+			width: `${dimensions.miniDrawerWidthSmall}vw`,
+		},
+		'@media (max-width:600px)': {
+			width: `${dimensions.miniDrawerWidthMobile}vw`,
+		},
+	},
+	menuBtn: {
+		cursor: 'pointer',
+		transform: 'scale(0.9)',
+		transition: 'all 200ms linear 0s',
+		'&:hover': {
+			transform: 'scale(1)',
+		},
 	},
 });
 
@@ -65,16 +83,20 @@ const DrawerButtons = (props) => {
 
 const MiniDrawer = (props) => {
 	const classes = useStyles();
+	const isSmall = useMediaQuery('(max-width: 1000px)');
 	return (
 		<div className={classes.miniDrawerContainer} id="mini-drawer">
-			<div style={{ margin: '20px 0 10px' }}>
-				<img
-					src="./images/menu_btn.svg"
-					alt="menu"
-					style={{ cursor: 'pointer' }}
-					onClick={props.onClick}
-				/>
-			</div>
+			{!isSmall && (
+				<div style={{ margin: '20px 0 10px' }}>
+					<img
+						src="./images/menu_btn.svg"
+						alt="menu"
+						onClick={props.onClick}
+						className={classes.menuBtn}
+					/>
+				</div>
+			)}
+			{isSmall && <div style={{ height: '8vh' }}></div>}
 			<DrawerButtons
 				title="Create & Upload"
 				active={props.currentIndex === 1}
