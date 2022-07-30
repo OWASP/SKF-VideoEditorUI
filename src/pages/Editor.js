@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import { makeStyles } from '@mui/styles';
 import './../App.css';
 import MiniDrawer, { TransitionLeft } from './../component/Editor/MiniDrawer';
-import editorDimensionsConstants from './../component/Editor/editorDimensionsConstants';
+import editorDimensionsConstants, {
+	mediaQueryContstants,
+} from './../component/Editor/editorDimensionsConstants';
 import {
 	MusicAndSFX,
 	RecordAndCreate,
@@ -19,6 +21,7 @@ import BottomDrawer from './../component/Editor/BottomDrawer';
 import { TransitionBottom } from './../component/Editor/BottomDrawer';
 import BottomDrawerActionContainer from './../component/Editor/BottomDrawerActionContainer';
 import VideoActionContainer from './../component/Editor/VideoActionContainer';
+import { useMediaQuery } from '@mui/material';
 
 const useStyles = makeStyles({
 	rootContainer: {
@@ -74,6 +77,12 @@ const useStyles = makeStyles({
 		color: 'white',
 		overflow: 'auto',
 		overflowX: 'hidden',
+		'@media (max-width: 1000px)': {
+			maxWidth: '100vw',
+			overflow: 'hidden',
+			margin: '0',
+			display: 'flex',
+		},
 	},
 	editorHeader: {
 		position: 'absolute',
@@ -107,6 +116,54 @@ const useStyles = makeStyles({
 		alignItems: 'center',
 		borderLeft: '2px solid grey',
 	},
+	menuBtn: {
+		cursor: 'pointer',
+		transform: 'scale(0.9)',
+		transition: 'all 200ms linear 0s',
+		'&:hover': {
+			transform: 'scale(1)',
+		},
+		marginLeft: '15px',
+		'@media (max-width: 1000px)': {
+			marginLeft: '30px',
+		},
+		'@media (max-width: 870px)': {
+			marginLeft: '25px',
+		},
+		'@media (max-width: 800px)': {
+			marginLeft: '20px',
+		},
+		'@media (max-width: 700px)': {
+			marginLeft: '15px',
+		},
+		'@media (max-width: 600px)': {
+			marginLeft: '30px',
+		},
+		'@media (max-width: 550px)': {
+			marginLeft: '25px',
+		},
+		'@media (max-width: 500px)': {
+			marginLeft: '20px',
+		},
+		'@media (max-width: 420px)': {
+			marginLeft: '13px',
+		},
+		'@media (max-width: 360px)': {
+			marginLeft: '10px',
+		},
+	},
+	header: {
+		width: '100vw',
+		height: '7vh',
+		position: 'absolute',
+		display: 'flex',
+		top: '0',
+		left: '0',
+		right: '0',
+		zIndex: '+100000',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+	},
 });
 
 const format = (seconds) => {
@@ -135,6 +192,15 @@ const Editor = (props) => {
 	const [progress, setProgress] = React.useState(null);
 	const [editorWidth, setEditorWidth] = React.useState();
 	const [progressBarPosition, setProgressBarPosition] = React.useState(0);
+	const [miniDrawerWidth, setMiniDrawerWidth] = useState(
+		editorDimensionsConstants.miniDrawerWidthLarge
+	);
+	const isMedium = useMediaQuery(`(max-width: ${mediaQueryContstants.medium})`);
+	const isSmall = useMediaQuery(`(max-width: ${mediaQueryContstants.small})`);
+	const isMobile = useMediaQuery(`(max-width: ${mediaQueryContstants.mobile})`);
+	const isPlayerAutoRes = useMediaQuery(
+		`(min-width:${mediaQueryContstants.playerAutoRes})`
+	);
 
 	const playerContainerRef = React.useRef(null);
 	const playerRef = React.useRef(null);
@@ -149,15 +215,26 @@ const Editor = (props) => {
 	const totalDuration = format(duration);
 
 	React.useEffect(() => {
-		setEditorWidth(
-			document.getElementById('main-editor').style.width.split('p')[0] * 1
-		);
+		let width =
+			document.getElementById('main-editor').style.width.split('v')[0] * 1;
+		width = (window.innerWidth * width) / 100;
+		setEditorWidth(width);
 	}, [isLeftDrawerOpen]);
 	React.useEffect(() => {
 		let pos = parseInt((currentTime / duration) * editorWidth);
-		if (currentTime === duration) pos = pos - 3;
 		setProgressBarPosition(pos);
 	}, [duration, currentTime, editorWidth]);
+	React.useEffect(() => {
+		if (isMobile) {
+			setMiniDrawerWidth(() => editorDimensionsConstants.miniDrawerWidthMobile);
+		} else if (isSmall) {
+			setMiniDrawerWidth(() => editorDimensionsConstants.miniDrawerWidthSmall);
+		} else if (isMedium) {
+			setMiniDrawerWidth(() => editorDimensionsConstants.miniDrawerWidthMedium);
+		} else {
+			setMiniDrawerWidth(() => editorDimensionsConstants.miniDrawerWidthLarge);
+		}
+	}, [isMedium, editorWidth, isSmall, isMobile]);
 	React.useEffect(() => {
 		setTransitionBottom(() => TransitionBottom);
 	}, []);
@@ -187,12 +264,10 @@ const Editor = (props) => {
 
 	const handleFastForward = () => {
 		playerRef.current.seekTo(playerRef.current.getCurrentTime() + 5);
-		console.log('click');
 	};
 
 	const handleRewind = () => {
 		playerRef.current.seekTo(playerRef.current.getCurrentTime() - 5);
-		console.log('click');
 	};
 	const handlePlay = () => {
 		setIsPlaying(!isPlaying);
@@ -208,61 +283,87 @@ const Editor = (props) => {
 
 	const dimensionConfigStyles = {
 		editorRootContainer: {
-			width: `${
-				isLeftDrawerOpen
-					? window.innerWidth -
-					  (editorDimensionsConstants.drawerComponentWidth +
-							editorDimensionsConstants.miniDrawerWidth)
-					: window.innerWidth - editorDimensionsConstants.miniDrawerWidth
-			}px`,
-			left: isLeftDrawerOpen
+			width: isSmall
+				? isLeftDrawerOpen
+					? '0px'
+					: '100vw'
+				: `${
+						isLeftDrawerOpen
+							? 100 -
+							  (editorDimensionsConstants.drawerComponentWidth +
+									miniDrawerWidth)
+							: 100 - miniDrawerWidth
+				  }vw`,
+			left: isSmall
+				? '0'
+				: isLeftDrawerOpen
 				? `${
-						editorDimensionsConstants.miniDrawerWidth +
-						editorDimensionsConstants.drawerComponentWidth
-				  }px`
-				: `${editorDimensionsConstants.miniDrawerWidth}px`,
-			maxWidth: `${
-				isLeftDrawerOpen
-					? window.innerWidth -
-					  (editorDimensionsConstants.drawerComponentWidth +
-							editorDimensionsConstants.miniDrawerWidth)
-					: window.innerWidth - editorDimensionsConstants.miniDrawerWidth
-			}px`,
+						miniDrawerWidth + editorDimensionsConstants.drawerComponentWidth
+				  }vw`
+				: `${miniDrawerWidth}vw`,
+			maxWidth:
+				!isSmall &&
+				`${
+					isLeftDrawerOpen
+						? 100 -
+						  (editorDimensionsConstants.drawerComponentWidth + miniDrawerWidth)
+						: 100 - miniDrawerWidth
+				}vw`,
 		},
 		videoContainerParent: {
 			height: `${
 				isBottomDrawerOpen
-					? window.innerHeight - editorDimensionsConstants.bottomDrawerHeight
-					: window.innerHeight
-			}px`,
+					? 100 - editorDimensionsConstants.bottomDrawerHeight
+					: 100
+			}vh`,
 		},
 		videoContainer: {
 			height: '100%',
 			maxHheight: `${
 				isBottomDrawerOpen
-					? window.innerHeight -
-					  editorDimensionsConstants.bottomDrawerHeight -
-					  50
-					: window.innerHeight - 50
-			}px`,
+					? 100 - editorDimensionsConstants.bottomDrawerHeight - 1
+					: 100 - 1
+			}vh`,
 			maxWidth: `${
 				isLeftDrawerOpen
-					? window.innerWidth -
-					  (editorDimensionsConstants.drawerComponentWidth +
-							editorDimensionsConstants.miniDrawerWidth +
-							40)
-					: window.innerWidth - editorDimensionsConstants.miniDrawerWidth - 40
-			}px`,
+					? 100 -
+					  (editorDimensionsConstants.drawerComponentWidth + miniDrawerWidth)
+					: 100 - miniDrawerWidth
+			}vw`,
 		},
 		bottomDrawerParent: {
-			width: `${
-				isLeftDrawerOpen
-					? window.innerWidth -
-					  (editorDimensionsConstants.drawerComponentWidth +
-							editorDimensionsConstants.miniDrawerWidth)
-					: window.innerWidth - editorDimensionsConstants.miniDrawerWidth
-			}px`,
-			height: `${editorDimensionsConstants.bottomDrawerHeight}px`,
+			width: isSmall
+				? isLeftDrawerOpen
+					? '0px'
+					: '100vw'
+				: `${
+						isLeftDrawerOpen
+							? 100 -
+							  (editorDimensionsConstants.drawerComponentWidth +
+									miniDrawerWidth)
+							: 100 - miniDrawerWidth
+				  }vw`,
+			height: `${editorDimensionsConstants.bottomDrawerHeight}vh`,
+		},
+		leftSnackBar: {
+			position: 'absolute',
+			bottom: 0,
+			left: isSmall ? `0px` : `${miniDrawerWidth}vw`,
+			right: isSmall && 0,
+			top: isSmall && 0,
+			margin: isSmall && 0,
+			padding: isSmall && 0,
+		},
+		playerContainer: {
+			maxWidth: !isMedium
+				? !isLeftDrawerOpen && isBottomDrawerOpen
+					? `${editorWidth - 650}px`
+					: `${editorWidth - 350}px`
+				: isPlayerAutoRes &&
+				  (!isLeftDrawerOpen && isBottomDrawerOpen
+						? `${editorWidth - 460}px`
+						: `${editorWidth - 200}px`),
+			maxHeight: `${100 - editorDimensionsConstants.bottomDrawerHeight}vw`,
 		},
 	};
 
@@ -270,44 +371,86 @@ const Editor = (props) => {
 		<div className="App">
 			<div className={classes.rootContainer}>
 				{/* Left Part */}
+				{isSmall && (
+					<div className={classes.header}>
+						<div className={classes.menuBtn}>
+							<img
+								src="./images/menu_btn.svg"
+								alt="menu"
+								style={{ cursor: 'pointer' }}
+								onClick={handleClickLeft(TransitionLeft)}
+							/>
+						</div>
+						<div>
+							<div className={classes.exportBtn}>
+								Export
+								<ArrowDropDownRoundedIcon fontSize="large" />
+							</div>
+						</div>
+					</div>
+				)}
 				<div>
 					{/* Mini Drawer */}
-					<MiniDrawer
-						onClick={handleClickLeft(TransitionLeft)}
-						handleYourMedia={handleLeftNav(TransitionLeft, 0)}
-						handleRecordAndCreate={handleLeftNav(TransitionLeft, 1)}
-						handleTemplates={handleLeftNav(TransitionLeft, 2)}
-						handleMusicAndSFX={handleLeftNav(TransitionLeft, 3)}
-						handleStockImages={handleLeftNav(TransitionLeft, 4)}
-						handleStockVideos={handleLeftNav(TransitionLeft, 5)}
-						handleText={handleLeftNav(TransitionLeft, 6)}
-						currentIndex={activeIndex}
-					/>
+					{!isSmall && (
+						<MiniDrawer
+							onClick={handleClickLeft(TransitionLeft)}
+							handleYourMedia={handleLeftNav(TransitionLeft, 0)}
+							handleRecordAndCreate={handleLeftNav(TransitionLeft, 1)}
+							handleTemplates={handleLeftNav(TransitionLeft, 2)}
+							handleMusicAndSFX={handleLeftNav(TransitionLeft, 3)}
+							handleStockImages={handleLeftNav(TransitionLeft, 4)}
+							handleStockVideos={handleLeftNav(TransitionLeft, 5)}
+							handleText={handleLeftNav(TransitionLeft, 6)}
+							currentIndex={activeIndex}
+						/>
+					)}
 					{/* DrawerContent */}
-
 					<Snackbar
 						open={isLeftDrawerOpen}
 						TransitionComponent={transitionLeft}
 						key={transitionLeft ? transitionLeft.name : ''}
-						style={{
-							position: 'absolute',
-							bottom: 0,
-							left: `${editorDimensionsConstants.miniDrawerWidth}px`,
-						}}
+						style={dimensionConfigStyles.leftSnackBar}
 						id="drawer-component"
 					>
 						<div
 							className={classes.leftDrawerComponent}
 							style={{
-								width: `${editorDimensionsConstants.drawerComponentWidth}px`,
+								width: isSmall
+									? `${window.innerWidth}px`
+									: `${editorDimensionsConstants.drawerComponentWidth}vw`,
 							}}
 						>
-							{activeIndex === 0 && <YourMedia />}
-							{activeIndex === 1 && <RecordAndCreate />}
-							{activeIndex === 2 && <Templates />}
-							{activeIndex === 3 && <MusicAndSFX />}
-							{activeIndex === 4 && <StockImages />}
-							{activeIndex === 6 && <Text />}
+							{isSmall && (
+								<div
+									style={{
+										width: `${miniDrawerWidth}vw`,
+									}}
+								>
+									<MiniDrawer
+										onClick={handleClickLeft(TransitionLeft)}
+										handleYourMedia={handleLeftNav(TransitionLeft, 0)}
+										handleRecordAndCreate={handleLeftNav(TransitionLeft, 1)}
+										handleTemplates={handleLeftNav(TransitionLeft, 2)}
+										handleMusicAndSFX={handleLeftNav(TransitionLeft, 3)}
+										handleStockImages={handleLeftNav(TransitionLeft, 4)}
+										handleStockVideos={handleLeftNav(TransitionLeft, 5)}
+										handleText={handleLeftNav(TransitionLeft, 6)}
+										currentIndex={activeIndex}
+									/>
+								</div>
+							)}
+							<div
+								style={{
+									width: isSmall && `${100 - miniDrawerWidth}vw`,
+								}}
+							>
+								{activeIndex === 0 && <YourMedia />}
+								{activeIndex === 1 && <RecordAndCreate />}
+								{activeIndex === 2 && <Templates />}
+								{activeIndex === 3 && <MusicAndSFX />}
+								{activeIndex === 4 && <StockImages />}
+								{activeIndex === 6 && <Text />}
+							</div>
 						</div>
 					</Snackbar>
 				</div>
@@ -317,12 +460,14 @@ const Editor = (props) => {
 					style={dimensionConfigStyles.editorRootContainer}
 					id="main-editor"
 				>
-					<div className={classes.editorHeader}>
-						<div className={classes.exportBtn}>
-							Export
-							<ArrowDropDownRoundedIcon fontSize="large" />
+					{!isSmall && (
+						<div className={classes.editorHeader}>
+							<div className={classes.exportBtn}>
+								Export
+								<ArrowDropDownRoundedIcon fontSize="large" />
+							</div>
 						</div>
-					</div>
+					)}
 					<div
 						className={classes.videoContainerParent}
 						style={dimensionConfigStyles.videoContainerParent}
@@ -335,10 +480,7 @@ const Editor = (props) => {
 						>
 							<div
 								ref={playerContainerRef}
-								style={{
-									width: '640px',
-									height: '400px',
-								}}
+								style={dimensionConfigStyles.playerContainer}
 							>
 								<ReactPlayer
 									ref={playerRef}
@@ -346,9 +488,6 @@ const Editor = (props) => {
 									controls={false}
 									light={false}
 									onProgress={handleProgress}
-									onDuration={(duration) => {
-										console.log(duration);
-									}}
 									url="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
 									id="react-player"
 									config={{

@@ -2,14 +2,23 @@ import React from 'react';
 import Grid from '@mui/material/Grid';
 import makeStyles from '@mui/styles/makeStyles';
 import DropzoneComponent from '../Dropzone';
-import editorDimensionsConstants from './editorDimensionsConstants';
+import { useMediaQuery } from '@material-ui/core';
 const useStyles = makeStyles({
+	componentRootContainer: {
+		'@media (max-width: 1000px)': {
+			paddingTop: '8vh',
+		},
+	},
 	navBtns: {
 		cursor: 'pointer',
 		paddingTop: '3px',
 		transition: 'all 300ms ease-in-out 0s',
 		textTransform: 'uppercase',
 		opacity: '0.6',
+		transform: 'scale(0.9)',
+		'&:hover': {
+			transform: 'scale(1)',
+		},
 	},
 	activeNavBtns: {
 		color: 'white',
@@ -19,6 +28,7 @@ const useStyles = makeStyles({
 		textTransform: 'uppercase',
 		opacity: '1',
 		borderTop: '2px solid #5a4cdb',
+		transform: 'scale(1)',
 	},
 	searchForm: {
 		width: '100%',
@@ -67,11 +77,7 @@ const useStyles = makeStyles({
 const SearchBar = ({ placeholder }) => {
 	const classes = useStyles();
 	return (
-		<div
-			style={{
-				width: editorDimensionsConstants.drawerComponentWidth,
-			}}
-		>
+		<div>
 			<form className={classes.searchForm}>
 				<input className={classes.searchInput} placeholder={placeholder} s />
 				<div className={classes.searchFilterBtn}>
@@ -87,13 +93,20 @@ const SearchBar = ({ placeholder }) => {
 };
 export function YourMedia(props) {
 	const classes = useStyles();
+	const isSmall = useMediaQuery('(max-width: 1000px)');
 	const [currentIndex, setCurrentIndex] = React.useState(0);
 	const handleCurrent = (ind) => {
 		setCurrentIndex(ind);
 	};
 	return (
 		<div
-			style={{ display: 'flex', flexDirection: 'column', padding: '15px 5px' }}
+			style={{
+				display: 'flex',
+				flexDirection: 'column',
+				padding: '15px 5px',
+				paddingTop: isSmall && '8vh',
+			}}
+			className={classes.componentRootContainer}
 		>
 			<div className={classes.mediaTopRowNavigator}>
 				<p
@@ -149,16 +162,20 @@ export function YourMedia(props) {
 	);
 }
 export function RecordAndCreate(props) {
+	const classes = useStyles();
 	return (
-		<>
+		<div className={classes.componentRootContainer}>
 			<DropzoneComponent />
-		</>
+		</div>
 	);
 }
 export function Templates(props) {
 	const classes = useStyles();
 	return (
-		<div style={{ overflow: 'auto', scrollbarWidth: '5px' }}>
+		<div
+			style={{ overflow: 'auto', scrollbarWidth: '5px' }}
+			className={classes.componentRootContainer}
+		>
 			<SearchBar placeholder="Search Templates" />
 			<Grid sx={{ flexGrow: 1 }} container spacing={2}>
 				<Grid item xs={12}>
@@ -180,8 +197,9 @@ export function Templates(props) {
 	);
 }
 export function MusicAndSFX(props) {
+	const classes = useStyles();
 	return (
-		<div>
+		<div className={classes.componentRootContainer}>
 			<SearchBar placeholder="Search Music" />
 		</div>
 	);
@@ -190,7 +208,7 @@ export function MusicAndSFX(props) {
 export function StockImages(props) {
 	const classes = useStyles();
 	return (
-		<div>
+		<div className={classes.componentRootContainer}>
 			<SearchBar placeholder="Search Images" />
 			<Grid sx={{ flexGrow: 1 }} container spacing={2}>
 				<Grid item xs={12}>
@@ -214,7 +232,7 @@ export function StockImages(props) {
 export function Text(props) {
 	const classes = useStyles();
 	return (
-		<div>
+		<div className={classes.componentRootContainer}>
 			<SearchBar placeholder="Search Text" />
 			<Grid sx={{ flexGrow: 1 }} container spacing={2}>
 				<Grid item xs={12}>
