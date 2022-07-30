@@ -22,7 +22,7 @@
 		"react-dropzone": "^14.2.1",
 		"react-otp-input": "^2.4.0",
 		"react-player": "^2.10.0",
-		"react-scripts": "5.0.0",
+		"react-scripts": "5.0.1",
 		"screenfull": "^6.0.2",
 		"styled-components": "^5.3.5",
 		"validator": "9.2.0",
